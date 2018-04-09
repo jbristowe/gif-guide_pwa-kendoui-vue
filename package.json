@@ -14,6 +14,12 @@
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs"
   },
   "dependencies": {
+    "@progress/kendo-buttons-vue-wrapper": "^2018.1.313",
+    "@progress/kendo-charts-vue-wrapper": "^2018.1.313",
+    "@progress/kendo-dateinputs-vue-wrapper": "^2018.1.313",
+    "@progress/kendo-dropdowns-vue-wrapper": "^2018.1.313",
+    "@progress/kendo-theme-material": "^0.6.0",
+    "@progress/kendo-ui": "^2018.1.403",
     "vue": "^2.5.2"
   },
   "devDependencies": {
