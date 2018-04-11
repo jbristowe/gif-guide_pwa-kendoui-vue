@@ -26,7 +26,7 @@ With the CLI tool we can use it to create a project using the `vue init` command
 
 ![a gif creating a vue cli project](gifs/vue-init.gif)
 
-Once the project is created you'll see that it prompts us to change into the project directory and install the dependencies by running `npm install` or just `npm i` for short. Guess what we're going to do next. Follow directions of course! What kind of heathens do you think we are?
+Once the project is created you'll see that it prompts us to change into the project directory and install the dependencies by running `npm install` or just `npm i` for short. Guess what we're going to do next. Follow directions of course! What kind of rebels do you think we are?
 
 ```bash
 cd gif-guide_pwa-kendoui-vue
@@ -43,7 +43,286 @@ A project is born 👶! Knowing that we have a nice, running project will give u
 
 [🐙](https://github.com/tzmanics/gif-guide_pwa-kendoui-vue/commit/82ded4f410191800853003fc9c7e5d078b09afed) Hello? This is code 😋 Click the Octopus for the first commit.
 
-## UI Component Time! 📅
+## UI Component For You & Me! 📅
+The app we create today will give us the first steps in letting users log what emotions they are feeling each day. For now, we'll make a place for the user to set a date, choose from a small list of emojis and see a graph of the logged emotions. Here is the list of components we'll use today:
+
+- [Buttons](https://www.telerik.com/kendo-vue-ui/components/buttons/button/) for submitting
+- [Chart](https://www.telerik.com/kendo-vue-ui/components/charts/chart/) for visualizing the emotions
+- [DatePicker](https://www.telerik.com/kendo-vue-ui/components/dateinputs/datepicker/), you guessed it, for picking the date
+- [DropdownList](https://www.telerik.com/kendo-vue-ui/components/dropdowns/dropdownlist/) for quick emotion selection
+
+### Installing the Components
+
+As with most of the Kendo UI components, the first step we take is to install the component libraries. For the Vue library, we'll also want to install the Kendo UI library. I also want some styling, UX and accessibility. Thankfully, all of this (and more 😯) comes with installing one of the [Kendo UI themes](). For this project we'll use the [Material theme]() that is currently in beta.
+
+This can all be installed in one lovely `npm` install command:
+
+> `npm i @progress/kendo-buttons-vue-wrapper @progress/kendo-charts-vue-wrapper @progress/kendo-dateinputs-vue-wrapper @progress/kendo-dropdowns-vue-wrapper @progress/kendo-theme-material @progress/kendo-ui`
+
+![a gif install kendo components](gifs/npm-i-kendo.gif)
+
+[🐙](https://github.com/tzmanics/gif-guide_pwa-kendoui-vue/commit/4ee682ed2e8b818a8b4771952614e6fa4c49fe1f) Moar code!
+
+### My Main!
+
+We've got libraries! In the `main.js` file we can import just the components that we'll be using for this project from each of the libraries installed.
+
+![gif of main.js edits](gifs/main-js.gif)
+
+Now we use all that we've imported including the component installers which we'll pass to `Vue.use()`.
+
+![gif of using and adding components](gifs/main-js_2.gif)
+
+This is what the complete file looks like now:
+
+```js
+// src/main.js
+
+import Vue from 'vue'
+import App from './App'
+import {
+  Button, ButtonsInstaller
+} from '@progress/kendo-buttons-vue-wrapper'
+import {
+  Chart, ChartInstaller
+} from '@progress/kendo-charts-vue-wrapper'
+import {
+  DatePicker, DateinputsInstaller
+} from '@progress/kendo-dateinputs-vue-wrapper'
+import {
+  DropDownList, DropdownsInstaller
+} from '@progress/kendo-dropdowns-vue-wrapper'
+import '@progress/kendo-theme-material/dist/all.css'
+import '@progress/kendo-ui'
+
+Vue.config.productionTip = false
+Vue.use(ButtonsInstaller)
+Vue.use(ChartInstaller)
+Vue.use(DateinputsInstaller)
+Vue.use(DropdownsInstaller)
+
+/* eslint-disable no-new */
+new Vue({
+  el: '#app',
+  template: '<App/>',
+  components: {
+    App,
+    Button,
+    Chart,
+    DatePicker,
+    DropDownList
+  }
+})
+```
+
+[🐙](https://github.com/tzmanics/gif-guide_pwa-kendoui-vue/commit/2699cebb89263963c0cfc2a56321622c1217e47a) The `main.js` changes commit.
+
+### The `.vue` Files
+
+To actually put these components in the game, we have to edit the `App.vue` and `Hello.vue` files. With the `App.vue` file we'll mostly be deleting things, adding a few headers and the new component we'll make.
+
+![a gif of editing the `App.vue` file](gifs/app-vue.gif)
+
+Here is what the `App.vue` looks like now:
+
+```
+// src/App.vue
+
+<template>
+  <div id="app">
+    <h1> EIV </h1>
+    <h4> emotions in view </h4>
+    <emotion-input></emotion-input>
+  </div>
+</template>
+
+<script>
+import EmotionInput from './components/EmotionInput'
+
+export default {
+  name: 'app',
+  components: {
+    EmotionInput
+  }
+}
+</script>
+
+<style>
+</style>
+```
+
+[🐙](https://github.com/tzmanics/gif-guide_pwa-kendoui-vue/commit/010b5a122e0c7402284d30893fc7b973f297de22) The commit of the `App.vue` changes.
+
+### Template Time ⏰
+
+We'll actually just be editing and changing the name of the `Hello.vue` to make it a little easier. Inside, we'll delete the existing code.
+
+![a gif of adding ](gifs/ei-vue_1.gif)
+
+Then we can add each component that will be rendered on the page. Inside of a `div` we'll call `emotion-logging` we add the place to pick a date and an emotion. First up will be the `DatePicker` component. Here is what we're setting for the `DatePicker`:
+- `v-model`: vue's two-way binding to keep the date updated whenever it's changed
+- `min`: for the most far away date the user can choose
+- `max`: the most recent date the user can choose
+- `value`: what's placed in the text box, we'll use the `v-model` for this
+- `format`: how the date will be displayed
+
+![a gif of adding ](gifs/ei-vue_2.gif)
+
+The next component is the `dropdownlist` that we'll populate with a few emojis for users to pick from. The configurations we'll change here are:
+
+- `v-model`: to keep track of which value the user picks
+- `data-source`: the array of choices we'll be passing to the list
+- `index`: the index of the default, so `0` would be the first thing in our array
+
+![a gif of adding ](gifs/ei-vue_3.gif)
+
+Finally, we'll add the button to submit the new emotion and make a new `div` to add a chart component to visualize the added emotions. For the Kendo UI button we just need to add a click event listener with `@click`. When that event is triggered we want it to call the `addEmotion` method that will update the tally of the chosen emotion. The chart component will have more configurations:
+
+- `series-default-type`: this is the type of graph, e.g. `pie`, `donut`, etc.
+- `chart-area-background`: the default is a white background, here we don't want a background so we make it blank
+- `series`: the data to display in graph form
+- `tooltip`: setting if the tooltip is visible and what information it shows
+
+![a gif of adding ](gifs/ei-vue_4.gif)
+
+Voila, the top half (template section) of the `EmotionInput` component file:
+
+```
+// src/components/EmotionInput.vue
+
+<template>
+  <div class="emotion-box">
+    <div class="emotion-logging">
+      <h2> What are you feeling? </h2>
+      <kendo-datepicker
+        v-model="emotionDate"
+        :min="minDate"
+        :max="maxDate"
+        :value="emotionDate"
+        :format="'MM/dd/yy'"
+      >
+      </kendo-datepicker>
+      <kendo-dropdownlist
+        v-model="emotionSelected"
+        :data-source="emotionArray"
+        :index="0"
+      >
+      </kendo-dropdownlist>
+      <kendo-button @click='addEmotion'> Add Emotion </kendo-button>
+    </div>
+    <div class="emotion-graph">
+      <kendo-chart
+        :series-defaults-type="'pie'"
+        :chart-area-background="''"
+        :series="series"
+        :tooltip="tooltip"
+      >
+      </kendo-chart>
+    </div>
+  </div>
+</template>
+...
+
+```
+
+[🐙](https://github.com/tzmanics/gif-guide_pwa-kendoui-vue/commit/a64e851f2e7488c863d0a355f7e60fee9ce120fd) Lookey here! Components get added to the template 😃
+
+### Beyond the Template
+
+We now need to give values to all these different configurations we made. What better place to start than with the data we pass to our component. Here we return the variables that we've used inside out component like `emotionDate`, `minDate`, `maxDate`, `emotionArray`, `emotionSelected`, and `tooltip`. We'll also add a few variables that will be used inside of the method for incrementing the frequency of each emotion chosen: `happyFeels`, `sadFeels`, `funnyFeels`, and `angryFeels`. These are also what is used in the `series` data for the chart.
+
+![a gif of adding ](gifs/ei-vue_5.gif)
+
+The method that we add here is the one assigned to the click event on our button. Basically, it gets passed the `this.emotionSelected` which is, thanks to `v-model`, updated when a user picks an emotion from the dropdown. Based on which emotion is selected, it increments the count for that emotion.
+
+![a gif of adding ](gifs/ei-vue_6.gif)
+
+Finally, in order to always have the data for the chart component up-to-date, we use [computed properties](https://v1.vuejs.org/guide/computed.html). Inside computed we create `series` which we had assigned to the `series` configuration of our chart. This way, when the `addEmotion` updates one of the emotions the `data` array is also updated. This means the graph will update with each added emotion.
+
+![a gif of adding ](gifs/ei-vue_7.gif)
+
+Now the bottom half, or script section of the `EmotionInput.vue` file will look like this:
+
+```js
+// src/components/EmotionInput.vue
+
+...
+</template>
+
+<script>
+export default {
+  name: 'emotion-input',
+  data () {
+    return {
+      emotionDate: new Date(),
+      minDate: new Date(2017, 1, 1),
+      maxDate: new Date(),
+      emotionArray: [
+        '😃', '😢', '🤣', '😡'
+      ],
+      emotionSelected: '😃',
+      happyFeels: 0,
+      sadFeels: 0,
+      funnyFeels: 0,
+      angryFeels: 0,
+      tooltip: { visible: true, template: '#= value # days' }
+    }
+  },
+  methods: {
+    addEmotion () {
+      switch (this.emotionSelected) {
+        case '😃':
+          this.happyFeels++
+          break
+        case '😢':
+          this.sadFeels++
+          break
+        case '🤣':
+          this.funnyFeels++
+          break
+        case '😡':
+          this.angryFeels++
+          break
+        default:
+          console.log('No feels felt 😶')
+      }
+    }
+  },
+  computed: {
+    series: function () {
+      return [{
+        data: [{
+          category: '😃',
+          value: this.happyFeels,
+          color: '#BCFF3A'
+        }, {
+          category: '😢',
+          value: this.sadFeels,
+          color: '#5A9CE8'
+        }, {
+          category: '🤣',
+          value: this.funnyFeels,
+          color: '#E8DC36'
+        }, {
+          category: '😡',
+          value: this.angryFeels,
+          color: '#FF3938'
+        }, {
+        }]
+      }]
+    }
+  }
+}
+</script>
+...
+
+```
+
+If you still have your app running in the background or run `npm start` you can see the working app.
+
+![a gif of the working app!](gifs/ei-vue_8.gif)
+
+[🐙](https://github.com/tzmanics/gif-guide_pwa-kendoui-vue/commit/b52c044b0174cbc62d1841dbc35020aa14957def) The commit for the fun script section we added!
 
 ## Looking Good: Additional Styling
 
@@ -51,7 +330,7 @@ A project is born 👶! Knowing that we have a nice, running project will give u
 
 ## 👁 Service Worker for Offline Caching
 
-## Donezo! �
+## Donezo! ✅
 We haz a Progressive Web App in Vue 👀!! There are a lot of steps we can continue to take to make our applications more PWA-y. For instance, we can use the [Push API](https://developers.google.com/web/fundamentals/codelabs/push-notifications/) to create a service worker that send push notifications to let a user know to log their emotion for the day. Nifty, right? Here are a bunch of fun resources to help you build a more robust application with some more components and more PWA-y with more PWA info:
 
 - [Kendo UI Vue Components](https://www.telerik.com/kendo-vue-ui)
