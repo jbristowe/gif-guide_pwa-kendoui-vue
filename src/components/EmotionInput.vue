@@ -35,6 +35,62 @@ export default {
   name: 'emotion-input',
   data () {
     return {
+      emotionDate: new Date(),
+      minDate: new Date(2017, 1, 1),
+      maxDate: new Date(),
+      emotionArray: [
+        '😃', '😢', '🤣', '😡'
+      ],
+      emotionSelected: '😃',
+      happyFeels: 0,
+      sadFeels: 0,
+      funnyFeels: 0,
+      angryFeels: 0,
+      tooltip: { visible: true, template: '#= value # days' }
+    }
+  },
+  methods: {
+    addEmotion () {
+      switch (this.emotionSelected) {
+        case '😃':
+          this.happyFeels++
+          break
+        case '😢':
+          this.sadFeels++
+          break
+        case '🤣':
+          this.funnyFeels++
+          break
+        case '😡':
+          this.angryFeels++
+          break
+        default:
+          console.log('No feels felt 😶')
+      }
+    }
+  },
+  computed: {
+    series: function () {
+      return [{
+        data: [{
+          category: '😃',
+          value: this.happyFeels,
+          color: '#BCFF3A'
+        }, {
+          category: '😢',
+          value: this.sadFeels,
+          color: '#5A9CE8'
+        }, {
+          category: '🤣',
+          value: this.funnyFeels,
+          color: '#E8DC36'
+        }, {
+          category: '😡',
+          value: this.angryFeels,
+          color: '#FF3938'
+        }, {
+        }]
+      }]
     }
   }
 }
